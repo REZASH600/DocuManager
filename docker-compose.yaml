@@ -1,0 +1,78 @@
+services:
+  
+  web:
+    container_name: web
+    image: web
+    build: 
+       context: .
+       dockerfile: ./docker/django/Dockerfile
+
+    restart: always
+    volumes:
+      - ./core:/app
+      - static_files_volume:/app/static
+      - media_files_volume:/app/media
+    command: /start.sh  
+
+    env_file:
+      - ./envs/web.env
+      - ./envs/postgres.env
+
+    ports:
+      - "8000:8000"
+
+    depends_on:
+      - "db"
+
+  db:
+    container_name: db
+    image : postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - envs/postgres.env
+
+  redis:
+      container_name: "redis"
+      image: "redis"
+      restart: always
+
+  rabbitmq:
+      container_name: "rabbitmq"
+      image: "rabbitmq:management"
+      restart: always
+      ports:
+        - '5672:5672'
+        - '15672:15672'
+
+    
+  celery:
+      container_name: celery
+      image: celery
+      build:
+        context: .
+        dockerfile: ./docker/django/Dockerfile
+
+      restart: always
+      volumes:
+        - ./core:/app
+      command: >
+        sh -c "celery -A config worker -l INFO -Q tasks"
+
+      env_file:
+        - ./envs/web.env
+        - ./envs/postgres.env  
+      
+      depends_on:
+      - redis
+      - rabbitmq
+      - web 
+
+
+
+
+
+volumes:
+  static_files_volume:
+  media_files_volume:
+  postgres_data:
