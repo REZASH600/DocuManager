@@ -37,7 +37,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "django_filters",
-    "drf_spectacular"
+    "drf_spectacular",
+    
+    # Apps
+    "apps.participants.apps.ParticipantsConfig",
 ]
 
 MIDDLEWARE = [
@@ -139,20 +142,17 @@ CELERY_BROKER_URL = config(
 CELERY_RESULT_BACKEND = config("CELERY_RESULT_BACKEND", default="redis://redis:6379/0")
 
 
-
 # DRF
 REST_FRAMEWORK = {
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
-
 
 
 # DRF Spectacular
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Document Manager',
-    'DESCRIPTION': 'API documentation for Document Manager',
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
- 
+    "TITLE": "Document Manager",
+    "DESCRIPTION": "API documentation for Document Manager",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
