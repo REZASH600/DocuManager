@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     
     # Apps
     "apps.participants.apps.ParticipantsConfig",
+    "apps.documents.apps.DocumentsConfig",
 ]
 
 MIDDLEWARE = [
