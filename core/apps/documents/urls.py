@@ -1,7 +1,8 @@
 from django.urls import path
 from .views import (
     DocumentCategoryListCreateAPIView,
-    DocumentCategoryUpdateDestroyAPIView
+    DocumentCategoryUpdateDestroyAPIView,
+    DocumentCreateAPIView,
 )
 
 
@@ -17,5 +18,5 @@ urlpatterns = [
         DocumentCategoryUpdateDestroyAPIView.as_view(),
         name="category-update-delete",
     ),
-
+    path("", DocumentCreateAPIView.as_view(), name="document-create"),
 ]

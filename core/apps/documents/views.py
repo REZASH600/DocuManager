@@ -1,7 +1,13 @@
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    CreateAPIView,
+)
+
 from django_filters.rest_framework import DjangoFilterBackend
 from apps.documents.models import DocumentCategory
 from . import serializers, filters
+
 
 
 class DocumentCategoryListCreateAPIView(ListCreateAPIView):
@@ -9,8 +15,6 @@ class DocumentCategoryListCreateAPIView(ListCreateAPIView):
     serializer_class = serializers.DocumentCategorySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = filters.DocumentCategoryFilter
-
-
 
 
 class DocumentCategoryUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
@@ -22,3 +26,9 @@ class DocumentCategoryUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         instance.is_deleted = True
         instance.save()
         return instance
+
+
+class DocumentCreateAPIView(CreateAPIView):
+    serializer_class = serializers.DocumentSerializer
+
+    
