@@ -6,3 +6,6 @@ class DocumentsConfig(AppConfig):
     name = 'apps.documents'
     verbose_name = "Document"
     verbose_name_plural = "Documents"
+
+    def ready(self):
+        import apps.documents.signals
