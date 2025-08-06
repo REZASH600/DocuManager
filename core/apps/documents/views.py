@@ -5,8 +5,8 @@ from . import serializers, filters
 
 
 class DocumentCategoryListCreateAPIView(ListCreateAPIView):
-    serializer_class = serializers.DocumentCategorySerializer
     queryset = DocumentCategory.objects.filter(is_deleted=False)
+    serializer_class = serializers.DocumentCategorySerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = filters.DocumentCategoryFilter
 
@@ -15,8 +15,8 @@ class DocumentCategoryListCreateAPIView(ListCreateAPIView):
 
 class DocumentCategoryUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
     http_method_names = ["patch", "delete"]
-    serializer_class = serializers.DocumentCategorySerializer
     queryset = DocumentCategory.objects.filter(is_deleted=False)
+    serializer_class = serializers.DocumentCategorySerializer
 
     def perform_destroy(self, instance):
         instance.is_deleted = True

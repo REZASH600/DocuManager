@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from apps.documents.models import DocumentCategory, DocumentType
+from apps.documents.models import DocumentCategory, DocumentType, Document
 
 
 class DocumentTypeSerializer(serializers.ModelSerializer):
@@ -15,13 +15,14 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
             "is_active",
             "is_deleted",
         ]
+        extra_kwargs = {"is_deleted": {"write_only": True}}
 
 
 class DocumentCategorySerializer(serializers.ModelSerializer):
-    types = serializers.SerializerMethodField()  
+    types = serializers.SerializerMethodField()
     document_types_input = DocumentTypeSerializer(
         many=True, write_only=True, required=False
-    )  
+    )
 
     document_count = serializers.SerializerMethodField()
 
@@ -37,6 +38,7 @@ class DocumentCategorySerializer(serializers.ModelSerializer):
             "document_count",
             "is_deleted",
         ]
+        extra_kwargs = {"is_deleted": {"write_only": True}}
 
     def get_types(self, obj):
         # Only return active document types
@@ -74,11 +76,20 @@ class DocumentCategorySerializer(serializers.ModelSerializer):
                     except DocumentType.DoesNotExist as e:
                         raise serializers.ValidationError(
                             f"DocumentType with id {type_id} does not exist in this category."
-                        ) 
+                        )
                 else:
-                    DocumentType.objects.create(
-                        category=instance, **type_data
-                    )
-
+                    DocumentType.objects.create(category=instance, **type_data)
 
         return instance
+
+
+class DocumentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = [
+            "company_id",
+            "participant",
+            "document_type",
+            "file",
+            "is_active",
+        ]
