@@ -14,10 +14,16 @@ def ensure_single_active_document_per_type(sender, instance, **kwargs):
         return  # Ignore deleted documents
 
     if instance.is_active:
-        Document.objects.filter(
+
+        active_docs = Document.objects.filter(
             document_type=instance.document_type,
             is_active=True,
-        ).exclude(pk=instance.pk).update(is_active=False)
+        ).exclude(pk=instance.pk)
+
+        UploadedTextFile.objects.filter(document__in=active_docs).delete()
+        active_docs.update(is_active=False)
+
+
     else:
         has_active = (
             Document.objects.filter(

@@ -1,6 +1,11 @@
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from apps.documents.models import DocumentCategory
+from apps.documents.models import (
+    DocumentCategory,
+    DocumentType,
+    Document,
+    UploadedTextFile,
+)
 
 
 @receiver(pre_save, sender=DocumentCategory)
@@ -24,8 +29,8 @@ def soft_delete_related_types_and_documents_and_text_files(sender, instance, **k
             is_deleted=True
         )
 
-        Document.objects.filter(document_type__category=instance, is_deleted=False).update(is_deleted=True)
+        Document.objects.filter(
+            document_type__category=instance, is_deleted=False
+        ).update(is_deleted=True)
 
         UploadedTextFile.objects.filter(document_type__category=instance).delete()
-
-
