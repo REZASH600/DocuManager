@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from apps.documents.models import DocumentCategory, DocumentType, Document
+from django.db.models import Count, Q, Sum
 
 
 class DocumentTypeSerializer(serializers.ModelSerializer):
@@ -13,9 +14,7 @@ class DocumentTypeSerializer(serializers.ModelSerializer):
             "private_visible",
             "public_visible",
             "is_active",
-            "is_deleted",
         ]
-        extra_kwargs = {"is_deleted": {"write_only": True}}
 
 
 class DocumentCategorySerializer(serializers.ModelSerializer):
@@ -36,9 +35,7 @@ class DocumentCategorySerializer(serializers.ModelSerializer):
             "types",
             "document_types_input",
             "document_count",
-            "is_deleted",
         ]
-        extra_kwargs = {"is_deleted": {"write_only": True}}
 
     def get_types(self, obj):
         # Only return active document types
@@ -46,9 +43,14 @@ class DocumentCategorySerializer(serializers.ModelSerializer):
         return DocumentTypeSerializer(active_types, many=True).data
 
     def get_document_count(self, obj):
-        return sum(
-            doc_type.documents.filter(is_active=True, is_deleted=False).count()
-            for doc_type in obj.document_types.all()
+        return (
+            obj.document_types.annotate(
+                active_doc_count=Count(
+                    "documents",
+                    filter=Q(documents__is_active=True, documents__is_deleted=False),
+                )
+            ).aggregate(total=Sum("active_doc_count"))["total"]
+            or 0
         )
 
     def create(self, validated_data):
