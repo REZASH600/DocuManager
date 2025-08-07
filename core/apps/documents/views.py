@@ -5,9 +5,8 @@ from rest_framework.generics import (
 )
 
 from django_filters.rest_framework import DjangoFilterBackend
-from apps.documents.models import DocumentCategory
+from apps.documents.models import DocumentCategory, Document
 from . import serializers, filters
-
 
 
 class DocumentCategoryListCreateAPIView(ListCreateAPIView):
@@ -31,4 +30,13 @@ class DocumentCategoryUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
 class DocumentCreateAPIView(CreateAPIView):
     serializer_class = serializers.DocumentSerializer
 
-    
+
+class DocumentDetailAPIView(RetrieveUpdateDestroyAPIView):
+    http_method_names = ["get", "patch", "delete"]
+    queryset = Document.objects.filter(is_deleted=False)
+    serializer_class = serializers.DocumentSerializer
+
+    def perform_destroy(self, instance):
+        instance.is_deleted = True
+        instance.save()
+        return instance

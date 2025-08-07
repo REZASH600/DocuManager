@@ -3,6 +3,7 @@ from .views import (
     DocumentCategoryListCreateAPIView,
     DocumentCategoryUpdateDestroyAPIView,
     DocumentCreateAPIView,
+    DocumentDetailAPIView,
 )
 
 
@@ -19,4 +20,5 @@ urlpatterns = [
         name="category-update-delete",
     ),
     path("", DocumentCreateAPIView.as_view(), name="document-create"),
+    path("<int:pk>/", DocumentDetailAPIView.as_view(), name="document-detail"),
 ]
