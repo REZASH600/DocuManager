@@ -1,11 +1,8 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from apps.documents.models import DocumentType, Document, UploadedTextFile
-from apps.documents.utils.document_helpers import (
-    should_extract_text_for_type,
-    extract_pdf_text,
-)
-
+from apps.documents.utils.document_helpers import should_extract_text_for_type
+from apps.documents.tasks.extract_text import extract_text_from_document
 
 @receiver(pre_save, sender=DocumentType)
 def pre_save_document_type(sender, instance, **kwargs):
@@ -67,9 +64,4 @@ def post_save_document_type(sender, instance, **kwargs):
         ).exclude(uploaded_texts__isnull=False)
 
         for doc in documents:
-            file_path = doc.file.path
-            text = extract_pdf_text(file_path)
-            if text:
-                UploadedTextFile.objects.create(
-                    text=text, document=doc, document_type=instance
-                )
+            extract_text_from_document.delay(doc.pk)

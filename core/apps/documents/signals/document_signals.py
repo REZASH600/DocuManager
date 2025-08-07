@@ -1,10 +1,8 @@
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from apps.documents.models import Document, UploadedTextFile
-from apps.documents.utils.document_helpers import (
-    should_extract_text_for_document,
-    extract_pdf_text,
-)
+from apps.documents.utils.document_helpers import should_extract_text_for_document
+from apps.documents.tasks.extract_text import extract_text_from_document
 
 
 @receiver(pre_save, sender=Document)
@@ -69,9 +67,4 @@ def post_save_document(sender, instance, created, **kwargs):
     """
     if created or getattr(instance, "_should_extract_text", False):
         if should_extract_text_for_document(instance):
-            file_path = instance.file.path
-            text = extract_pdf_text(file_path)
-            if text:
-                UploadedTextFile.objects.create(
-                    text=text, document=instance, document_type=instance.document_type
-                )
+            extract_text_from_document.delay(instance.pk)
