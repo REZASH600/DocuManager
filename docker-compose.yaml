@@ -56,13 +56,15 @@ services:
       restart: always
       volumes:
         - ./core:/app
+        - static_files_volume:/app/static
+        - media_files_volume:/app/media
       command: >
         sh -c "celery -A config worker -l INFO -Q tasks"
 
       env_file:
         - ./envs/web.env
         - ./envs/postgres.env  
-      
+    
       depends_on:
       - redis
       - rabbitmq

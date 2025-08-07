@@ -1,12 +1,8 @@
 from celery import shared_task
-from apps.documents.utils.document_helpers import (
-    extract_pdf_text,
-    should_extract_text_for_type,
-)
+from apps.documents.utils.document_helpers import extract_pdf_text
 import logging
 from apps.documents.models import Document, UploadedTextFile
-import gc 
-
+import gc
 
 logger = logging.getLogger(__name__)
 
