@@ -1,7 +1,6 @@
-
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from .models import DocumentCategory, UploadedTextFile, DocumentType, Document
+from apps.documents.models import DocumentCategory
 
 
 @receiver(pre_save, sender=DocumentCategory)
@@ -30,28 +29,3 @@ def soft_delete_related_types_and_documents_and_text_files(sender, instance, **k
         UploadedTextFile.objects.filter(document_type__category=instance).delete()
 
 
-
-
-
-
-@receiver(pre_save, sender=Document)
-def ensure_single_active_document_per_type(sender, instance, **kwargs):
-    """
-    Ensure only one active Document per DocumentType.
-    """
-    if instance.is_deleted:
-        return  # Ignore deleted documents
-
-    if instance.is_active:
-        Document.objects.filter(
-            document_type=instance.document_type,
-            is_active=True,
-        ).exclude(pk=instance.pk).update(is_active=False)
-    else:
-        has_active = Document.objects.filter(
-            document_type=instance.document_type,
-            is_active=True
-        ).exclude(pk=instance.pk).exists()
-
-        if not has_active:
-            instance.is_active = True
